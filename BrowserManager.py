@@ -1,7 +1,12 @@
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
 from LocalStorage import LocalStorage
 import json
+import time
 
 # Set up Firefox (comment out headless if you want to watch it)
 options = Options()
@@ -55,11 +60,17 @@ with open("./Settings.json", "r") as file:
     jsonString = file.read()
 
 storage = LocalStorage(driver)
-storage["persist:root"] = wrap_into_nested_json(jsonString)
-driver.refresh()
+weirdJson = wrap_into_nested_json(jsonString)
+print(weirdJson)
+storage["persist:root"] = weirdJson
 
+WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID, 'root')))
+driver.refresh()
+WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID, 'root')))
+    
 print("Settings Loaded")
 print(storage["persist:root"])
+# print("Page:", driver.page_source)
     
 
 # === Wait here until the user types 'q' ===
